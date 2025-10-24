@@ -1,4 +1,6 @@
 # TODO: Add shebang line: #!/usr/bin/env python3
+#!/usr/bin/env python3
+
 # Assignment 5, Question 2: Python Data Processing
 # Process configuration files for data generation.
 
@@ -19,8 +21,13 @@ def parse_config(filepath: str) -> dict:
         '100'
     """
     # TODO: Read file, split on '=', create dict
-    pass
-
+    
+    with open(filepath, "r") as f:
+        lines = f.readlines()
+        dict = {}
+        for line in lines:
+            dict[line.split("=")[0]] = line.split("=")[1].strip()
+        return (dict)
 
 def validate_config(config: dict) -> dict:
     """
@@ -44,7 +51,20 @@ def validate_config(config: dict) -> dict:
         True
     """
     # TODO: Implement with if/elif/else
-    pass
+    # return false if not interger
+    result = {}
+    for key in config:
+        if type(int(config[key]))is int:
+            if key == 'sample_data_rows' and int(config[key]) > 0:
+                result[key] = True
+            elif key == 'sample_data_min' and int(config[key]) >= 1:
+                result[key] = True  
+            elif key == 'sample_data_max' and int(config[key]) > int(config['sample_data_min']):
+                result[key] = True
+            else:
+                result[key] = False
+    return result
+
 
 
 def generate_sample_data(filename: str, config: dict) -> None:
@@ -66,10 +86,19 @@ def generate_sample_data(filename: str, config: dict) -> None:
         >>> import random
         >>> random.randint(18, 75)  # Returns random integer between 18-75
     """
+    import random
     # TODO: Parse config values (convert strings to int)
+    rows = int(config['sample_data_rows'])
+    min_val = int(config['sample_data_min'])
+    max_val = int(config['sample_data_max'])
     # TODO: Generate random numbers and save to file
+    # only one number per row in the csv file and nothing else
+    # store the numbers here 
+    with open(filename, "w") as f:
+        for i in range(rows):
+            f.write(str(random.randint(min_val, max_val)) + "\n")
     # TODO: Use random module with config-specified range
-    pass
+    random.randint(min_val, max_val)
 
 
 def calculate_statistics(data: list) -> dict:
@@ -100,4 +129,7 @@ if __name__ == '__main__':
     # 
     # TODO: Read the generated file and calculate statistics
     # TODO: Save statistics to output/statistics.txt
-    pass
+    import random
+    print(random.randint(18, 75))
+    config = {'sample_data_rows': '100', 'sample_data_min': '18', 'sample_data_max': '75'}
+    generate_sample_data('sample_data.csv', config)
