@@ -1,4 +1,5 @@
 # TODO: Add shebang line: #!/usr/bin/env python3
+#!/usr/bin/env python3
 # Assignment 5, Question 3: Data Utilities Library
 # Core reusable functions for data loading, cleaning, and transformation.
 #
@@ -23,7 +24,7 @@ def load_data(filepath: str) -> pd.DataFrame:
         >>> df.shape
         (10000, 18)
     """
-    pass
+    return(pd.read_csv(filepath))
 
 
 def clean_data(df: pd.DataFrame, remove_duplicates: bool = True,
@@ -42,7 +43,11 @@ def clean_data(df: pd.DataFrame, remove_duplicates: bool = True,
     Example:
         >>> df_clean = clean_data(df, sentinel_value=-999)
     """
-    pass
+    df_clean = df.copy()
+    if remove_duplicates:
+        df_clean .drop_duplicates(inplace=True)    
+    df_clean.replace(sentinel_value, np.nan,inplace=True)
+    return df_clean
 
 
 def detect_missing(df: pd.DataFrame) -> pd.Series:
@@ -60,8 +65,8 @@ def detect_missing(df: pd.DataFrame) -> pd.Series:
         >>> missing['age']
         15
     """
-    pass
-
+    return df.isnull().sum()
+    
 
 def fill_missing(df: pd.DataFrame, column: str, strategy: str = 'mean') -> pd.DataFrame:
     """
@@ -78,7 +83,17 @@ def fill_missing(df: pd.DataFrame, column: str, strategy: str = 'mean') -> pd.Da
     Example:
         >>> df_filled = fill_missing(df, 'age', strategy='median')
     """
-    pass
+    df_copy = df.copy() # make a copy to avoid modifying original DataFrame
+    if strategy == 'mean':
+        fill_value = df_copy[column].mean()
+    elif strategy == 'median':
+        fill_value = df_copy[column].median()
+    elif strategy == 'ffill':
+        df_copy[column] = df_copy[column].fillna(method='ffill')
+        return df_copy
+
+    return df_copy[column].fillna(fill_value)
+    
 
 
 def filter_data(df: pd.DataFrame, filters: list) -> pd.DataFrame:
@@ -195,7 +210,7 @@ def summarize_by_group(df: pd.DataFrame, group_col: str,
 
 if __name__ == '__main__':
     # Optional: Test your utilities here
-    print("Data utilities loaded successfully!")
+    print("Data utilities loaded successfully!")   
     print("Available functions:")
     print("  - load_data()")
     print("  - clean_data()")
@@ -211,3 +226,9 @@ if __name__ == '__main__':
     # test_df = pd.DataFrame({'age': [25, 30, 35], 'bmi': [22, 25, 28]})
     # print("Test DataFrame created:", test_df.shape)
     # print("Test detect_missing:", detect_missing(test_df))
+
+
+    df = load_data('data/clinical_trial_raw.csv')
+    print(df.shape)
+    df_clean = clean_data(df, sentinel_value=-999)
+    print(detect_missing(df_clean))
