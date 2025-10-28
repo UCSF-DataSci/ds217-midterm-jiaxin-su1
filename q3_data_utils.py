@@ -91,9 +91,8 @@ def fill_missing(df: pd.DataFrame, column: str, strategy: str = 'mean') -> pd.Da
     elif strategy == 'ffill':
         df_copy[column] = df_copy[column].fillna(method='ffill')
         return df_copy
-
-    return df_copy[column].fillna(fill_value)
-    
+    df_copy[column] = df_copy[column].fillna(fill_value)
+    return df_copy
 
 
 def filter_data(df: pd.DataFrame, filters: list) -> pd.DataFrame:
@@ -126,7 +125,27 @@ def filter_data(df: pd.DataFrame, filters: list) -> pd.DataFrame:
         >>> filters = [{'column': 'age', 'condition': 'in_range', 'value': [18, 65]}]
         >>> df_filtered = filter_data(df, filters)
     """
-    pass
+    
+    df_filtered = df.copy()
+    for f in filters:
+        col = f['column']
+        cond = f['condition']
+        val = f['value']
+
+        if cond == 'equals':
+            df_filtered = df_filtered[df_filtered[col] == val]
+        elif cond == 'greater_than':
+            df_filtered = df_filtered[df_filtered[col] > val]
+        elif cond == 'less_than':
+            df_filtered = df_filtered[df_filtered[col] < val]
+        elif cond == 'in_range':
+            df_filtered = df_filtered[(df_filtered[col] >= val[0]) & (df_filtered[col] <= val[1])]
+        elif cond == 'in_list':
+            df_filtered = df_filtered[df_filtered[col].isin(val)]
+
+    return df_filtered
+
+    
 
 
 def transform_types(df: pd.DataFrame, type_map: dict) -> pd.DataFrame:
@@ -149,7 +168,18 @@ def transform_types(df: pd.DataFrame, type_map: dict) -> pd.DataFrame:
         ... }
         >>> df_typed = transform_types(df, type_map)
     """
-    pass
+    df_types = df.copy()
+    for col, co_type in type_map.items():
+        if co_type == 'datetime':
+            df_types[col] = pd.to_datetime(df_types[col], errors='coerce')
+        elif co_type == 'numeric':
+            df_types[col] = pd.to_numeric(df_types[col], errors='coerce')
+        elif co_type == 'category':
+            df_types[col] = df_types[col].astype('category')
+        elif co_type == 'string':
+            df_types[col] = df_types[col].astype('string')
+
+    return df_types
 
 
 def create_bins(df: pd.DataFrame, column: str, bins: list,
@@ -175,7 +205,13 @@ def create_bins(df: pd.DataFrame, column: str, bins: list,
         ...     labels=['<18', '18-34', '35-49', '50-64', '65+']
         ... )
     """
-    pass
+    df_binned = df.copy()
+    if new_column is None:
+        df_binned[column] = pd.cut(df_binned[column], bins=bins, labels=labels)
+    else:
+        df_binned[new_column] = pd.cut(df_binned[column], bins=bins, labels=labels)
+    return df_binned
+
 
 
 def summarize_by_group(df: pd.DataFrame, group_col: str,
@@ -203,8 +239,14 @@ def summarize_by_group(df: pd.DataFrame, group_col: str,
         ...     {'age': ['mean', 'std'], 'bmi': 'mean'}
         ... )
     """
-    pass
-
+    
+    df_summary = df.copy()
+    if agg_dict is None: 
+        num_cols = df_summary.select_dtypes(include="number").columns # get numeric columns and its index
+        return df_summary.groupby(group_col)[num_cols].describe()
+    return df_summary.groupby(group_col).agg(agg_dict) # if agg_dict is provided
+    # agg() can take a dict mapping columns to agg functions
+ 
 
 
 
@@ -228,7 +270,41 @@ if __name__ == '__main__':
     # print("Test detect_missing:", detect_missing(test_df))
 
 
-    df = load_data('data/clinical_trial_raw.csv')
-    print(df.shape)
+
+    data = {
+    "id": ["p001", "p002", "p002", "p003", "p004", "p005", "p005"],
+    "age": [25, 17, 35, -999, 68, 29,29],
+    "site": ["Site C", "Site B", "Site A", "Site C", "Site B", "Site A","Site A"],
+    "diastolic_bp": [88, 75, 92, 65, 70, 95,95]
+}
+
+    df = pd.DataFrame(data)
+    print(df)
     df_clean = clean_data(df, sentinel_value=-999)
-    print(detect_missing(df_clean))
+    print(df_clean)
+    missing = detect_missing(df_clean)
+    print("Missing values:\n", missing)
+    df_filled = fill_missing(df_clean, 'age', strategy='median')
+    print(df_filled)
+    # filter example
+    filters = [{'column': 'age', 'condition': 'in_range', 'value': [18, 65]}]
+    df_filtered = filter_data(df_filled, filters)
+    print(df_filtered)
+    #  type transformation example
+    type_map = {
+        'id': 'string',
+        'age': 'numeric',
+        'site': 'category'
+    }
+    df_typed = transform_types(df_filled, type_map)
+
+    # binning example
+    df_binned = create_bins(
+        df_filled,
+        column='age',
+        bins=[0, 18, 35, 50, 65, 100],
+        labels=['<18', '18-34', '35-49', '50-64', '65+'])
+    print(df_binned['age'])
+    # grouping and summarization example
+    df_summarized = summarize_by_group(df_filled, "site", {'age': ['mean', 'std'], 'diastolic_bp': 'mean'})
+    print(df_summarized)
