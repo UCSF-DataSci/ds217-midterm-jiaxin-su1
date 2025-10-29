@@ -2,22 +2,22 @@ Final Report
 ======================
 
 overall statistics by site:
-         age_mean     age_std   bmi_mean
-site                                    
-site a  56.364005  162.536292  25.875183
-site b  62.401957  139.050180  25.706681
-site c  57.312108  157.941868  25.789583
-site d  63.491006  136.140058  25.565682
-site e  57.064897  157.697644  25.476502
+         age_mean    age_std   bmi_mean
+site                                   
+site a  81.185386  13.570452  26.253180
+site b  80.436608  13.313686  26.126254
+site c  80.734684  13.225948  26.321225
+site d  80.743504  13.357950  26.308061
+site e  80.406096  13.600576  26.307965
 
 Group by 'site' and apply multiple aggregations on age(mean, std, min, max), bmi(mean, std), and systolic_bp(mean, median):
         age_mean  age_std  age_min  age_max  bmi_mean  bmi_std  systolic_bp_mean  systolic_bp_median
 site                                                                                                
-site a     56.36   162.54     -999      100     25.88     4.98            117.35               117.0
-site b     62.40   139.05     -999      100     25.71     5.02            117.13               117.0
-site c     57.31   157.94     -999      100     25.79     5.42            117.98               118.0
-site d     63.49   136.14     -999      100     25.57     5.88            117.94               118.0
-site e     57.06   157.70     -999      100     25.48     6.08            117.50               117.0
+site a     81.19    13.57       44      100     26.25     3.74            117.34               117.0
+site b     80.44    13.31       45      100     26.13     3.63            117.13               117.0
+site c     80.73    13.23       43      100     26.32     3.70            117.94               117.0
+site d     80.74    13.36       45      100     26.31     3.66            117.89               117.0
+site e     80.41    13.60       44      100     26.31     3.63            117.48               117.0
 
 Cross-tabulation of intervention_group vs dropout status:
 dropout               no   yes

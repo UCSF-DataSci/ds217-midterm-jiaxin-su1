@@ -35,4 +35,5 @@ jupyter nbconvert --execute --to notebook q7_aggregation.ipynb || {
 # Use either `$?` or `||` operator to check exit codes and stop on failure
 # Add a log entry for each notebook execution or failure
 # jupyter nbconvert --execute --to notebook q4_exploration.ipynb
+# create execuated noyebook for each script
 echo "Pipeline complete!" >> reports/pipeline_log.txt
