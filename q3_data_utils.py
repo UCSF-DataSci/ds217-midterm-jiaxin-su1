@@ -207,7 +207,8 @@ def create_bins(df: pd.DataFrame, column: str, bins: list,
     """
     df_binned = df.copy()
     if new_column is None:
-        df_binned[column] = pd.cut(df_binned[column], bins=bins, labels=labels)
+        new_column = f"{column}_binned"
+        df_binned[new_column] = pd.cut(df_binned[column], bins=bins, labels=labels)
     else:
         df_binned[new_column] = pd.cut(df_binned[column], bins=bins, labels=labels)
     return df_binned

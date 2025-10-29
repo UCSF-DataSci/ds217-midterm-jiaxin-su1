@@ -1,0 +1,31 @@
+Final Report
+======================
+
+overall statistics by site:
+         age_mean     age_std   bmi_mean
+site                                    
+site a  56.364005  162.536292  25.875183
+site b  62.401957  139.050180  25.706681
+site c  57.312108  157.941868  25.789583
+site d  63.491006  136.140058  25.565682
+site e  57.064897  157.697644  25.476502
+
+Group by 'site' and apply multiple aggregations on age(mean, std, min, max), bmi(mean, std), and systolic_bp(mean, median):
+        age_mean  age_std  age_min  age_max  bmi_mean  bmi_std  systolic_bp_mean  systolic_bp_median
+site                                                                                                
+site a     56.36   162.54     -999      100     25.88     4.98            117.35               117.0
+site b     62.40   139.05     -999      100     25.71     5.02            117.13               117.0
+site c     57.31   157.94     -999      100     25.79     5.42            117.98               118.0
+site d     63.49   136.14     -999      100     25.57     5.88            117.94               118.0
+site e     57.06   157.70     -999      100     25.48     6.08            117.50               117.0
+
+Cross-tabulation of intervention_group vs dropout status:
+dropout               no   yes
+intervention_group            
+control             0.85  0.15
+treatment a         0.85  0.15
+treatment b         0.86  0.14
+
+1. When grouped by site, Site D shows the highest mean age and the average BMI is consistent across all different site.
+2. The dropout condition and adherence_pct is similar across all the intervention groups.
+3. The treatment a group got the lowest mean rate of CVD.
